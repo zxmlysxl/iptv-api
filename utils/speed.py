@@ -248,8 +248,16 @@ def sort_urls_by_speed_and_resolution(name, data, logger=None):
     """
     filter_data = []
     for url, date, resolution, origin in data:
+        result = {
+            "url": remove_cache_info(url),
+            "date": date,
+            "delay": None,
+            "speed": None,
+            "resolution": resolution,
+            "origin": origin
+        }
         if origin == "important":
-            filter_data.append((url, date, resolution, origin))
+            filter_data.append(result)
             continue
         cache_key_match = re.search(r"cache:(.*)", url.partition("$")[2])
         cache_key = cache_key_match.group(1) if cache_key_match else None
@@ -259,24 +267,17 @@ def sort_urls_by_speed_and_resolution(name, data, logger=None):
                 speed, delay, cache_resolution = cache_item['speed'], cache_item['delay'], cache_item['resolution']
                 resolution = cache_resolution or resolution
                 if speed is not None:
-                    url = remove_cache_info(url)
                     try:
                         if logger:
                             logger.info(
-                                f"Name: {name}, URL: {url}, Date: {date}, Delay: {delay} ms, Speed: {speed:.2f} M/s, Resolution: {resolution}"
+                                f"Name: {name}, URL: {result["url"]}, Date: {date}, Delay: {delay} ms, Speed: {speed:.2f} M/s, Resolution: {resolution}"
                             )
                     except Exception as e:
                         print(e)
-                    filter_data.append(
-                        {
-                            "url": url,
-                            "date": date,
-                            "delay": delay,
-                            "speed": speed,
-                            "resolution": resolution,
-                            "origin": origin
-                        }
-                    )
+                    result["delay"] = delay
+                    result["speed"] = speed
+                    result["resolution"] = resolution
+                    filter_data.append(result)
 
     def combined_key(item):
         speed, delay, resolution, origin = item["speed"], item["delay"], item["resolution"], item["origin"]
