@@ -4,7 +4,7 @@ config_path = "config"
 
 output_path = "output"
 
-config_cache_path = os.path.join(config_path, "cache.pkl")
+whitelist_path = os.path.join(config_path, "whitelist.txt")
 
 result_path = os.path.join(output_path, "result_new.txt")
 
